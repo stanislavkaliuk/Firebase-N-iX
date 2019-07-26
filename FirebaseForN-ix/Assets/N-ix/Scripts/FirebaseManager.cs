@@ -150,7 +150,12 @@ public class FirebaseManager : MonoBehaviour
 
     private IEnumerator GetAssetBundle(Action<AssetBundle> OnComplete)
     {
-        string url = "https://firebasestorage.googleapis.com/v0/b/fir-n-ix.appspot.com/o/bundlematerial?alt=media&token=8ae0747b-1888-4295-8210-7a0dfc49486d";
+        string url = "";
+        storage.RootReference.Child("bundlematerial").GetDownloadUrlAsync().ContinueWithOnMainThread<Uri>(task =>
+        {
+            url = task.Result.ToString();
+        });
+        yield return new WaitWhile(()=>string.IsNullOrEmpty(url));
         using (UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url))
         {
             yield return request.SendWebRequest();
